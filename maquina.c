@@ -199,6 +199,19 @@ Maquina* pegarMaquina(char* caminho_arquivo) {
             }
         }
 
+        if (ch == EOF && i < simulacao->qnt_entradas - 1) {
+            printf("Ainda falta %d entradas.\n", simulacao->qnt_entradas - i - 1);
+            fclose(fptr);
+            destruirMaquina(maquina);
+            return NULL;
+        }
+        else if (ch != EOF && i == simulacao->qnt_entradas - 1) {
+            printf("Leu todas as entradas e ainda tem texto no arquivo.\n");
+            fclose(fptr);
+            destruirMaquina(maquina);
+            return NULL;
+        }
+
         simulacao->entradas[qnt_entrada] = '\0';
     }
 
