@@ -1,1 +1,1 @@
-# TC-Simulador-Maquina-Turing
+# Teoria da Computação - Simulador Maquina Turing
