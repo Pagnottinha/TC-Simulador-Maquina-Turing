@@ -313,6 +313,8 @@ void printTransicoes(Maquina* maquina) {
 }
 
 void limparFita(Simulacao* simulacao) {
+    simulacao->cabeca = 0;
+
     for (int i = 0; i < MAX_FITA; i++) {
         simulacao->fita[i] = '-';
     }
