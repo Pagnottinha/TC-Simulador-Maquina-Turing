@@ -330,9 +330,70 @@ void printarFita(Maquina* maquina) {
 }
 
 void iniciarSimulacao(Maquina* maquina) {
+    
+    // Percorre todas as entradas
     for (unsigned int i = 0; i < maquina->simulacao->qnt_entradas; i++) {
-        printf("%s\n", maquina->simulacao->entradas[i]);
-    }
+        limparFita(maquina->simulacao); // Realiza a limpeza da fita para iniciar a cada entrada
+        printf("Entrada: %s\n", maquina->simulacao->entradas[i]);
 
-    printarFita(maquina);
+        printf("Antes ");
+        printarFita(maquina);
+
+        // Adiciona na fita cada caractere de cada entrada        
+        for (unsigned int j = 0; maquina->simulacao->entradas[i][j] != '\0'; j++) {
+            maquina->simulacao->fita[maquina->simulacao->cabeca + j] = maquina->simulacao->entradas[i][j];
+        }
+
+        printf("Depois ");
+        printarFita(maquina);
+
+        unsigned int fim = 0;        
+        maquina->simulacao->estado_atual = 1; // Ao iniciar define sempre o primeiro estado
+
+        while (!fim) {
+            char simbolo_lido = maquina->simulacao->fita[maquina->simulacao->cabeca];
+
+            // Verifica se a máquina está no estado de parada (estado 5)
+            if (maquina->simulacao->estado_atual == 5) {
+                printf("Máquina atingiu o estado de parada (5).\n");
+                fim = 1;
+                continue;  // Finaliza a simulação para essa entrada
+            }
+
+            Transicao* transicao_aplicavel = NULL;
+
+            // Encontra a transição apropriada com base no estado atual e no símbolo lido
+            for (unsigned int k = 0; k < maquina->qnt_transicoes; k++) {
+                Transicao* transicao = maquina->transicoes[k];
+                if (transicao->estado_inicial == maquina->simulacao->estado_atual &&
+                    transicao->simbolo_transicao == simbolo_lido) {
+                    transicao_aplicavel = transicao;
+                    break;
+                }
+            }
+
+            if (transicao_aplicavel != NULL) {
+                // Grava o novo símbolo na fita
+                maquina->simulacao->fita[maquina->simulacao->cabeca] = transicao_aplicavel->simbolo_gravar;
+
+                // Move a cabeça da máquina
+                if (transicao_aplicavel->movimento == DIREITA) {
+                    maquina->simulacao->cabeca++;
+                } else if (transicao_aplicavel->movimento == ESQUERDA) {
+                    maquina->simulacao->cabeca--;
+                }
+
+                // Atualiza o estado da máquina
+                maquina->simulacao->estado_atual = transicao_aplicavel->estado_final;
+
+            } else {
+                printf("Erro: Nenhuma transição aplicável no estado %d com o símbolo '%c'\n", 
+                        maquina->simulacao->estado_atual, simbolo_lido);
+                fim = 1;  // Termina a simulação em caso de erro
+            }
+
+        }
+        
+        printarFita(maquina);  // Mostra o estado final da fita após todas as transições
+    }
 }
