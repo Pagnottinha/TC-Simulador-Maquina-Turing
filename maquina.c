@@ -137,14 +137,11 @@ Maquina* pegarMaquina(char* caminho_arquivo) {
         simulacao->entradas[i] = calloc(MAX_FITA, sizeof(char)); // Aloca memória para a entrada
 
         unsigned int qnt_entrada = 0; // Contador de caracteres da entrada
-        qnt_lido = 0; // Reseta o contador de caracteres lidos
 
         while ((ch = fgetc(fptr)) != EOF) { // Lê caracteres até o final do arquivo
             if (ch == '\n' || ch == '\r') {
                 break; // Quebra o loop em nova linha
             }
-
-            qnt_lido++; // Incrementa o contador de caracteres lidos
 
             // Pega a posição do caractere na máscara
             unsigned int index = (ch - 1) % 32;
@@ -162,7 +159,7 @@ Maquina* pegarMaquina(char* caminho_arquivo) {
             qnt_entrada += 1; // Incrementa o contador de caracteres da entrada
 
             // Verifica se o limite de caracteres da fita foi ultrapassado
-            if (qnt_lido > MAX_FITA) {
+            if (qnt_entrada > MAX_FITA) {
                 printf("Foi ultrapassado o limite de %d simbolos que cabem na fita.\n", MAX_FITA);
                 fclose(fptr); // Fecha o arquivo
                 destruirMaquina(maquina); // Libera a memória da máquina
@@ -177,16 +174,17 @@ Maquina* pegarMaquina(char* caminho_arquivo) {
             destruirMaquina(maquina); // Libera a memória da máquina
             return NULL; // Retorna NULL
         }
-        // Verifica se há texto adicional no arquivo após ler todas as entradas
-        else if ((ch = fgetc(fptr)) != EOF && i == simulacao->qnt_entradas - 1) {
-            printf("Leu todas as entradas e ainda tem texto no arquivo.\n");
-            fclose(fptr); // Fecha o arquivo
-            destruirMaquina(maquina); // Libera a memória da máquina
-            return NULL; // Retorna NULL
-        }
 
         // Finaliza a string da entrada
         simulacao->entradas[i][qnt_entrada] = '\0';
+    }
+
+    // Verifica se há texto adicional no arquivo após ler todas as entradas
+    if (fgetc(fptr) != EOF) {
+        printf("Leu todas as entradas e ainda tem texto no arquivo.\n");
+        fclose(fptr); // Fecha o arquivo
+        destruirMaquina(maquina); // Libera a memória da máquina
+        return NULL; // Retorna NULL
     }
 
     // Atribui a simulação à máquina
@@ -275,13 +273,13 @@ int validarTransicao(Transicao* transicao, Maquina* maquina, unsigned int linha,
     }
 
     // Verifica se o símbolo de transição é válido, considerando a máscara do alfabeto
-    if ((mascara_alfabeto & (transicao->simbolo_transicao % 32) == 0) && transicao->simbolo_transicao != '-') {
+    if (((mascara_alfabeto & (1 << (transicao->simbolo_transicao - 1) % 32)) == 0) && transicao->simbolo_transicao != '-') {
         printf("Simbolo de transicao (%c) invalido na transicao %d\n", transicao->simbolo_transicao, linha + 1);
         return 0; // Retorna 0 se o símbolo de transição for inválido
     }
 
     // Verifica se o símbolo a ser gravado é válido, considerando a máscara do alfabeto
-    if ((mascara_alfabeto & (transicao->simbolo_gravar % 32) == 0) && transicao->simbolo_gravar != '-') {
+    if (((mascara_alfabeto & (1 << (transicao->simbolo_gravar - 1) % 32)) == 0) && transicao->simbolo_transicao != '-') {
         printf("Simbolo de gravacao (%c) invalido na transicao %d\n", transicao->simbolo_gravar, linha + 1);
         return 0; // Retorna 0 se o símbolo de gravação for inválido
     }
