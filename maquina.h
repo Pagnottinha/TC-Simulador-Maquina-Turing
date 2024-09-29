@@ -11,10 +11,11 @@
 #define MAX_FITA 100
 
 // Declarações de estruturas que representam a máquina de Turing
+typedef enum { ESQUERDA, DIREITA, INVALIDO } Movimento; // Enum para movimentos da cabeça
+
 typedef struct transicao Transicao; // Estrutura para representar transições
 typedef struct simulacao Simulacao;   // Estrutura para simulação
 typedef struct maquina Maquina;         // Estrutura para a máquina
-typedef enum { ESQUERDA, DIREITA, INVALIDO } Movimento; // Enum para movimentos da cabeça
 
 // Estrutura principal da máquina de Turing
 struct maquina {
